@@ -1,0 +1,60 @@
+; LAB08 PART A - SERIAL I/O
+					
+	
+ORG 0000H
+	
+SETUP:
+	MOV TMOD, #20H
+	MOV TH1, #-3
+	MOV SCON, #50H
+	SETB TR1
+	
+	
+LOOP:
+	MOV DPTR, #STRING
+	ACALL DISPLAY_STR
+	
+	SJMP LOOP
+	
+DISPLAY_STR:
+	
+	CLR A
+	MOVC A, @A+DPTR
+	JZ EXIT
+	
+	MOV SBUF, A
+	JNB TI, $
+	CLR TI
+	ACALL DELAY
+	
+	INC DPTR
+	
+	SJMP DISPLAY_STR
+EXIT:
+	RET
+
+STRING: DB "ELET 144C IS POWER!", 0DH, 0AH, 0
+
+; DELAY
+; -------------------------------------
+; Delays for half a second using loops
+; -------------------------------------
+; 500,000 / .36169 = 1382399 / 256 = 5399 / 256 = 21.09 -> 22
+; 1382399 / 22 = 62836 / 256 = 245
+;
+DELAY:
+	MOV R5, #22
+OUTER:
+	MOV R4, #0
+MIDDL:
+	MOV R3, #245
+	
+INNER:
+	DJNZ R3, INNER
+	DJNZ R4, MIDDL
+	DJNZ R5, OUTER
+	
+	RET
+
+
+END
